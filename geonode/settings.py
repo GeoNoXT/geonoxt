@@ -868,6 +868,7 @@ OAUTH2_PROVIDER = {
         "read": "Read scope",
         "write": "Write scope",
         "groups": "Access to your groups",
+        "profile": "Access to your profile",
     },
     "CLIENT_ID_GENERATOR_CLASS": "oauth2_provider.generators.ClientIdGenerator",
     "OAUTH2_SERVER_CLASS": "geonode.security.oauth2_servers.OIDCServer",
