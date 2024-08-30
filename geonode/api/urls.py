@@ -27,6 +27,7 @@ from . import resourcebase_api as resourcebase_resources
 
 api = Api(api_name="api")
 
+"""
 api.register(resources.GroupCategoryResource())
 api.register(resources.GroupResource())
 api.register(resources.GroupProfileResource())
@@ -42,6 +43,7 @@ api.register(resourcebase_resources.FeaturedResourceBaseResource())
 api.register(resourcebase_resources.LayerResource())
 api.register(resourcebase_resources.MapResource())
 api.register(resourcebase_resources.GeoAppResource())
+"""
 api.register(resourcebase_resources.ResourceBaseResource())
 
 router = routers.DynamicRouter()
