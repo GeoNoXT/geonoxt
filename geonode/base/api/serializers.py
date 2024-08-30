@@ -815,7 +815,7 @@ class OwnerSerializer(BaseResourceCountSerializer):
         count_type = "owner"
         view_name = "owners-list"
         model = get_user_model()
-        fields = ("pk", "username", "first_name", "last_name", "avatar", "perms")
+        fields = ("pk", "username", "first_name", "last_name", "avatar", "perms", "group_list_public", "group_list_private")
 
     avatar = AvatarUrlField(240, read_only=True)
 
