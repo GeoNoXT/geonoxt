@@ -55,8 +55,11 @@ def verify_access_token(request, key):
 @csrf_exempt
 @logged_in_or_apiauth()
 def user_info(request):
-    user = request.user
     print("request", request)
+    print("request dir", dir(request))
+
+    user = request.user
+
     print("user", user)
 
     if not user or user.is_anonymous:
