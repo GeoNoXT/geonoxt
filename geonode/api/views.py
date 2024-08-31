@@ -53,7 +53,7 @@ def verify_access_token(request, key):
     return token
 
 @csrf_exempt
-@logged_in_or_apiauth
+@logged_in_or_apiauth()
 def user_info(request):
     user = request.user
     print("request", request)
