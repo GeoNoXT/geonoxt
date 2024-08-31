@@ -29,10 +29,9 @@ from guardian.models import Group
 from oauth2_provider.models import AccessToken
 from oauth2_provider.exceptions import OAuthToolkitError, FatalClientError
 from allauth.account.utils import user_field, user_email, user_username
-from rest_framework.decorators import authentication_classes
 
 from ..utils import json_response
-from ..decorators import superuser_or_apiauth
+from ..decorators import superuser_or_apiauth, logged_in_or_apiauth
 from ..base.auth import get_token_object_from_session, get_auth_token
 
 
@@ -54,6 +53,7 @@ def verify_access_token(request, key):
     return token
 
 @csrf_exempt
+@logged_in_or_apiauth
 def user_info(request):
     user = request.user
     print("request", request)
