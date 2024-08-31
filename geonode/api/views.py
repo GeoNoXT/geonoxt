@@ -29,6 +29,7 @@ from guardian.models import Group
 from oauth2_provider.models import AccessToken
 from oauth2_provider.exceptions import OAuthToolkitError, FatalClientError
 from allauth.account.utils import user_field, user_email, user_username
+from rest_framework.decorators import authentication_classes
 
 from ..utils import json_response
 from ..decorators import superuser_or_apiauth
@@ -52,12 +53,11 @@ def verify_access_token(request, key):
         return None
     return token
 
-from oauth2_provider.decorators import protected_resource
-
 @csrf_exempt
-@protected_resource(scopes=['read'])
 def user_info(request):
     user = request.user
+    print("request", request)
+    print("user", user)
 
     if not user or user.is_anonymous:
         out = {"success": False, "status": "error", "errors": {"user": ["User is not authenticated"]}}
