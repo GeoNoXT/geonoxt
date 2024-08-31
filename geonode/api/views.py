@@ -31,7 +31,7 @@ from oauth2_provider.exceptions import OAuthToolkitError, FatalClientError
 from allauth.account.utils import user_field, user_email, user_username
 
 from ..utils import json_response
-from ..decorators import superuser_or_apiauth, logged_in_or_apiauth
+from ..decorators import superuser_or_apiauth
 from ..base.auth import get_token_object_from_session, get_auth_token
 
 
@@ -56,6 +56,8 @@ def verify_access_token(request, key):
 def user_info(request):
     print("request", request)
     print("request dir", dir(request))
+    print("request headers", request.headers)
+    print("request headers dir", dir(request.headers))
 
     user = request.user
 
