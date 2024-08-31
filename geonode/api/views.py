@@ -54,7 +54,7 @@ def verify_access_token(request, key):
 
 
 @csrf_exempt
-@logged_in_or_apiauth()
+@superuser_or_apiauth()
 def user_info(request):
     user = request.user
 
