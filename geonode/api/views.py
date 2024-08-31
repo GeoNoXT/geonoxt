@@ -52,9 +52,10 @@ def verify_access_token(request, key):
         return None
     return token
 
+from oauth2_provider.decorators import protected_resource
 
 @csrf_exempt
-@superuser_or_apiauth()
+@protected_resource(scopes=['read'])
 def user_info(request):
     user = request.user
 
