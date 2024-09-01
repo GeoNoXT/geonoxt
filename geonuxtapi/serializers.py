@@ -10,7 +10,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='name'
     )
-    permissions = serializers.SerializerMethodField()
+    # permissions = serializers.SerializerMethodField()
 
     class Meta:
         model = User
