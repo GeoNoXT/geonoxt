@@ -52,16 +52,10 @@ def verify_access_token(request, key):
         return None
     return token
 
+
 @csrf_exempt
 def user_info(request):
-    print("request", request)
-    print("request dir", dir(request))
-    print("request headers", request.headers)
-    print("request headers dir", dir(request.headers))
-
     user = request.user
-
-    print("user", user)
 
     if not user or user.is_anonymous:
         out = {"success": False, "status": "error", "errors": {"user": ["User is not authenticated"]}}
