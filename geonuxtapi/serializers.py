@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class UserInfoSerializer(serializers.ModelSerializer):
     groups = serializers.SlugRelatedField(
         many=True,
@@ -15,9 +16,12 @@ class UserInfoSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'first_name', 'last_name', 'email', 'username',
-            'groups', 'is_superuser', 'is_staff', 'is_active',
-            'date_joined', 'last_login', 'permissions'
+            'perms', 'groups', 'is_superuser', 'is_staff', 'is_active',
+            'date_joined', 'last_login', 'permissions', 'avatar', 'link'
         ]
 
+    """
+    # TODO: esto creo que no se utiliza por ahora pero lo dejo para revisarlo en profundidad después
     def get_permissions(self, obj):
         return obj.get_all_permissions()
+    """

@@ -19,8 +19,11 @@ class UserInfoView(APIView):
         # Añadimos campos adicionales manualmente
         response_data = serializer.data
         response_data.update({
-            "sub": str(user.id),
+            "sub": user.id,
             "name": f"{user.first_name} {user.last_name}",
+            "given_name": user.first_name,
+            "family_name": user.last_name,
+            "preferred_username": user.username,
         })
 
         return Response(response_data)
