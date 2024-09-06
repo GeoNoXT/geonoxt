@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.contrib.auth import logout
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 from .serializers import UserInfoSerializer
 
 # Create your views here.
@@ -27,3 +29,15 @@ class UserInfoView(APIView):
         })
 
         return Response(response_data)
+
+
+class DirectLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['post', 'options', 'head']
+
+    def post(self, request, *args, **kwargs):
+        # Cerramos la sesión del usuario
+        logout(request)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
