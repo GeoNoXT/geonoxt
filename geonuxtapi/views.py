@@ -81,6 +81,4 @@ class LogoutView(APIView):
             return HttpResponseRedirect(next_url)
         else:
             # Devolver una respuesta JSON indicando éxito si no hay URL de retorno
-            return Response({'detail': 'Logout successful'}, status=status.HTTP_204_OK)
-
-
+            return Response({'detail': 'Logout successful'}, status=status.HTTP_204_NO_CONTENT)
