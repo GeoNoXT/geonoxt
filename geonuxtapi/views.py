@@ -31,18 +31,13 @@ class UserInfoView(APIView):
         return Response(response_data)
 
 
+
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
     http_method_names = ['post', 'options', 'head']
 
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-        response["Access-Control-Allow-Origin"] = "*"
-        response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-        response["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-        return response
-
     def options(self, request, *args, **kwargs):
+        """Manejo de solicitudes preflight OPTIONS para CORS"""
         response = Response(status=status.HTTP_200_OK)
         response["Access-Control-Allow-Origin"] = "*"
         response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
@@ -50,6 +45,8 @@ class LogoutView(APIView):
         return response
 
     def post(self, request, *args, **kwargs):
+        """Cerrar sesión del usuario autenticado"""
         logout(request)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
+        response = Response(status=status.HTTP_204_NO_CONTENT)
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
