@@ -67,24 +67,20 @@ class UserInfoView(APIView):
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
-    http_method_names = ['post', 'options']
+    http_method_names = ['get', 'options']
 
-    def options(self, request, *args, **kwargs):
-        """Manejo de solicitudes preflight OPTIONS para CORS"""
-        response = Response(status=status.HTTP_200_OK)
-        response["Access-Control-Allow-Origin"] = "*"
-        response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-        response["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-        response["Access-Control-Allow-Credentials"] = "true"
-        return response
-
-    def post(self, request, *args, **kwargs):
-        """Cerrar sesión del usuario autenticado"""
+    def get(self, request, *args, **kwargs):
+        # Hacer logout
         logout(request)
-        response = Response(status=status.HTTP_204_NO_CONTENT)
-        response["Access-Control-Allow-Origin"] = "*"
-        response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-        response["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-        response["Access-Control-Allow-Credentials"] = "true"
-        return response
+
+        # Obtener la URL de retorno desde los parámetros
+        next_url = request.GET.get('next', None)
+
+        if next_url:
+            # Redirigir a la URL de retorno si está presente
+            return HttpResponseRedirect(next_url)
+        else:
+            # Devolver una respuesta JSON indicando éxito si no hay URL de retorno
+            return Response({'detail': 'Logout successful'}, status=status.HTTP_204_OK)
+
 
