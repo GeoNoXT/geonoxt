@@ -31,9 +31,14 @@ class UserInfoView(APIView):
         return Response(response_data)
 
 
-class DirectLogoutView(APIView):
+class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
     http_method_names = ['post', 'options', 'head']
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
     def post(self, request, *args, **kwargs):
         # Cerramos la sesión del usuario
