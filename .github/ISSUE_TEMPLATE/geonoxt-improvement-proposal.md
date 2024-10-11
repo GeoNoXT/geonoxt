@@ -1,5 +1,5 @@
 ---
-name: GeoNode Improvement Proposal
+name: GeoNoXT Improvement Proposal
 about: Create an Improvement Proposal for this project
 title: ''
 labels: ''
@@ -19,7 +19,7 @@ Describe briefly and clearly what this proposal is meant for.
 
 ### Assigned to Release
 
-This proposal is for GeoNode <version>.
+This proposal is for GeoNoXT <version>.
 
 ### State
 
