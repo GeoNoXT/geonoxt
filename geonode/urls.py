@@ -32,6 +32,7 @@ from django.views.i18n import JavaScriptCatalog
 from django.contrib.sitemaps.views import sitemap
 
 import geonode.proxy.urls
+from geonode.upload.api.views import ImporterViewSet, ResourceImporter
 from . import views
 from . import version
 
@@ -42,7 +43,7 @@ from geonode import geoserver
 from geonode.utils import check_ogc_backend
 from geonode.base import register_url_event
 from geonode.messaging.urls import urlpatterns as msg_urls
-from .people.views import CustomSignupView
+from .people.views import CustomSignupView, CustomLoginView
 from oauth2_provider.urls import app_name as oauth2_app_name, base_urlpatterns, oidc_urlpatterns
 
 admin.autodiscover()
@@ -92,6 +93,7 @@ urlpatterns += [
     re_path(r"^h_keywords_api$", views.h_keywords, name="h_keywords_api"),
     # Social views
     re_path(r"^account/signup/", CustomSignupView.as_view(), name="account_signup"),
+    re_path(r"^account/login/", CustomLoginView.as_view(), name="account_login"),
     re_path(r"^account/", include("allauth.urls")),
     re_path(r"^invitations/", include("geonode.invitations.urls", namespace="geonode.invitations")),
     re_path(r"^people/", include("geonode.people.urls")),
@@ -123,13 +125,25 @@ urlpatterns += [
     re_path(r"^api/roles", roles, name="roles"),
     re_path(r"^api/adminRole", admin_role, name="adminRole"),
     re_path(r"^api/users", users, name="users"),
+    re_path(
+        r"api/v2/resources/(?P<pk>\w+)/copy",
+        ResourceImporter.as_view({"put": "copy"}),
+        name="importer_resource_copy",
+    ),
     re_path(r"^api/v2/", include(router.urls)),
     re_path(r"^api/v2/", include("geonode.api.urls")),
     re_path(r"^api/v2/", include("geonode.management_commands_http.urls")),
     re_path(r"^api/v2/api-auth/", include("rest_framework.urls", namespace="geonode_rest_framework")),
     re_path(r"^api/v2/", include("geonode.facets.urls")),
     re_path(r"^api/v2/", include("geonode.assets.urls")),
+    # metadata views
+    re_path(r"^api/v2/", include("geonode.metadata.urls")),
     re_path(r"", include(api.urls)),
+    re_path(
+        r"uploads/upload",
+        ImporterViewSet.as_view({"post": "create"}),
+        name="importer_upload",
+    ),
 ]
 
 # tinymce WYSIWYG HTML Editor
@@ -195,10 +209,6 @@ urlpatterns += geonode.proxy.urls.urlpatterns
 # Serve static files
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.LOCAL_MEDIA_URL, document_root=settings.MEDIA_ROOT)
-handler401 = "geonode.views.err403"
-handler403 = "geonode.views.err403"
-handler404 = "geonode.views.handler404"
-handler500 = "geonode.views.handler500"
 
 
 if settings.MONITORING_ENABLED:

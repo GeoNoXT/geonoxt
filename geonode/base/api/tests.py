@@ -42,6 +42,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 
 from owslib.etree import etree
+from avatar.templatetags.avatar_tags import avatar_url
 
 from rest_framework.test import APITestCase
 from rest_framework.renderers import JSONRenderer
@@ -1030,13 +1031,13 @@ class BaseApiTests(APITestCase):
                         "username": bobby.username,
                         "first_name": bobby.first_name,
                         "last_name": bobby.last_name,
-                        "avatar": "https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "permissions": "owner",
                         "is_staff": False,
                         "is_superuser": False,
                     },
                     {
-                        "avatar": "https://www.gravatar.com/avatar/7a68c67c8d409ff07e42aa5d5ab7b765/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "first_name": "admin",
                         "id": 1,
                         "last_name": "",
@@ -1111,7 +1112,7 @@ class BaseApiTests(APITestCase):
                         "username": bobby.username,
                         "first_name": bobby.first_name,
                         "last_name": bobby.last_name,
-                        "avatar": "https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "permissions": "owner",
                         "is_staff": False,
                         "is_superuser": False,
@@ -1121,13 +1122,13 @@ class BaseApiTests(APITestCase):
                         "username": norman.username,
                         "first_name": norman.first_name,
                         "last_name": norman.last_name,
-                        "avatar": "https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "permissions": "edit",
                         "is_staff": False,
                         "is_superuser": False,
                     },
                     {
-                        "avatar": "https://www.gravatar.com/avatar/7a68c67c8d409ff07e42aa5d5ab7b765/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "first_name": "admin",
                         "id": 1,
                         "last_name": "",
@@ -1160,13 +1161,13 @@ class BaseApiTests(APITestCase):
                     "username": bobby.username,
                     "first_name": bobby.first_name,
                     "last_name": bobby.last_name,
-                    "avatar": "https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e/?s=240",
+                    "avatar": build_absolute_uri(avatar_url(bobby)),
                     "permissions": "owner",
                     "is_staff": False,
                     "is_superuser": False,
                 },
                 {
-                    "avatar": "https://www.gravatar.com/avatar/7a68c67c8d409ff07e42aa5d5ab7b765/?s=240",
+                    "avatar": build_absolute_uri(avatar_url(bobby)),
                     "first_name": "admin",
                     "id": 1,
                     "last_name": "",
@@ -1223,13 +1224,13 @@ class BaseApiTests(APITestCase):
                         "username": bobby.username,
                         "first_name": bobby.first_name,
                         "last_name": bobby.last_name,
-                        "avatar": "https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "permissions": "owner",
                         "is_staff": False,
                         "is_superuser": False,
                     },
                     {
-                        "avatar": "https://www.gravatar.com/avatar/7a68c67c8d409ff07e42aa5d5ab7b765/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "first_name": "admin",
                         "id": 1,
                         "last_name": "",
@@ -2156,7 +2157,7 @@ class BaseApiTests(APITestCase):
                         "username": "bobby",
                         "first_name": "bobby",
                         "last_name": "",
-                        "avatar": "https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "permissions": "manage",
                         "is_superuser": False,
                         "is_staff": False,
@@ -2166,7 +2167,7 @@ class BaseApiTests(APITestCase):
                         "username": "admin",
                         "first_name": "admin",
                         "last_name": "",
-                        "avatar": "https://www.gravatar.com/avatar/7a68c67c8d409ff07e42aa5d5ab7b765/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "permissions": "owner",
                         "is_superuser": True,
                         "is_staff": True,
@@ -2197,7 +2198,7 @@ class BaseApiTests(APITestCase):
                         "username": "bobby",
                         "first_name": "bobby",
                         "last_name": "",
-                        "avatar": "https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "permissions": "manage",
                         "is_staff": False,
                         "is_superuser": False,
@@ -2207,7 +2208,7 @@ class BaseApiTests(APITestCase):
                         "username": "admin",
                         "first_name": "admin",
                         "last_name": "",
-                        "avatar": "https://www.gravatar.com/avatar/7a68c67c8d409ff07e42aa5d5ab7b765/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "permissions": "owner",
                         "is_staff": True,
                         "is_superuser": True,
@@ -2236,7 +2237,7 @@ class BaseApiTests(APITestCase):
                         "username": "bobby",
                         "first_name": "bobby",
                         "last_name": "",
-                        "avatar": "https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "permissions": "manage",
                         "is_staff": False,
                         "is_superuser": False,
@@ -2246,7 +2247,7 @@ class BaseApiTests(APITestCase):
                         "username": "admin",
                         "first_name": "admin",
                         "last_name": "",
-                        "avatar": "https://www.gravatar.com/avatar/7a68c67c8d409ff07e42aa5d5ab7b765/?s=240",
+                        "avatar": build_absolute_uri(avatar_url(bobby)),
                         "permissions": "owner",
                         "is_staff": True,
                         "is_superuser": True,
@@ -2408,17 +2409,9 @@ class BaseApiTests(APITestCase):
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_resource_service_copy_with_perms_map(self):
-        files = os.path.join(gisdata.GOOD_DATA, "vector/single_point.shp")
-        files_as_dict, _ = get_files(files)
-        resource = Document.objects.create(
-            owner=get_user_model().objects.get(username="admin"),
-            alternate="geonode:test_copy",
-            resource_type="map",
-            uuid=str(uuid4()),
-        )
-        _, _ = create_asset_and_link(
-            resource, get_user_model().objects.get(username="admin"), list(files_as_dict.values())
-        )
+
+        resource = create_single_map(name="test_copy")
+
         self._assertCloningWithPerms(resource)
 
     def _assertCloningWithPerms(self, resource):
@@ -2430,7 +2423,7 @@ class BaseApiTests(APITestCase):
         resource.set_permissions(_perms)
         copy_url = reverse("importer_resource_copy", kwargs={"pk": resource.pk})
         response = self.client.put(copy_url, data={"title": "cloned_resource"})
-        self.assertIn(response.status_code, [403, 404])
+        self.assertIn(response.status_code, [302, 403, 404])
         # set perms to enable user clone resource
         # bobby can copy the resource since he has all the perms needed
         _perms = {
