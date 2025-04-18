@@ -57,7 +57,8 @@ pyproj<3.7.0
 OWSLib==0.31.0
 pycsw==2.6.1
 SQLAlchemy==2.0.30 # required by PyCSW
-Shapely==1.8.5.post1
+# Shapely==1.8.5.post1 # upgraded to 2.0.7 (GeoNoXT)
+Shapely==2.0.7
 mercantile==1.2.1
 numpy==1.26.*
 
@@ -136,7 +137,8 @@ django-ipware<7.1
 pycountry
 
 # production
-uWSGI==2.0.25.1
+# uWSGI==2.0.25.1 # upgraded to 2.0.28 (GeoNoXT)
+uWSGI==2.0.28
 gunicorn==22.0.0
 ipython==8.24.0
 docker==7.0.0
