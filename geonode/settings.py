@@ -341,6 +341,10 @@ MEMCACHED_LOCATION = os.getenv("MEMCACHED_LOCATION", "127.0.0.1:11211")
 MEMCACHED_LOCK_EXPIRE = int(os.getenv("MEMCACHED_LOCK_EXPIRE", 3600))
 MEMCACHED_LOCK_TIMEOUT = int(os.getenv("MEMCACHED_LOCK_TIMEOUT", 10))
 
+DATABASECACHE_ENABLED = ast.literal_eval(os.getenv("DATABASECACHE_ENABLED", "True"))
+DATABASECACHE_BACKEND = os.getenv("DATABASECACHE_BACKEND", "django.core.cache.backends.db.DatabaseCache")
+DATABASECACHE_LOCATION = os.getenv("DATABASECACHE_LOCATION", "cache_table")
+
 CACHES = {
     # DUMMY CACHE FOR DEVELOPMENT
     "default": {
@@ -382,6 +386,20 @@ if MEMCACHED_ENABLED:
     CACHES["default"] = {
         "BACKEND": MEMCACHED_BACKEND,
         "LOCATION": MEMCACHED_LOCATION,
+    }
+elif MEMCACHED_BACKEND:
+    CACHES["default"] = {
+        "BACKEND": DATABASECACHE_BACKEND,
+        "LOCATION": DATABASECACHE_LOCATION,
+    }
+else:
+    CACHES["default"] = {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "geonode-cache",
+        "TIMEOUT": 600,
+        "OPTIONS": {
+            "MAX_ENTRIES": 10000,
+        },
     }
 
 # Whitenoise Settings - ref.: http://whitenoise.evans.io/en/stable/django.html
