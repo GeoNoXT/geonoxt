@@ -35,8 +35,8 @@ RUN yes w | pip install --src /usr/src -r requirements.txt &&\
     yes w | pip install -e .
 
 # Cleanup apt update lists
-RUN apt-get autoremove --purge &&\
-    apt-get clean &&\
+RUN apt-get autoremove --purge && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Export ports
