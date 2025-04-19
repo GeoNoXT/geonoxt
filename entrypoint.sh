@@ -44,7 +44,7 @@ echo MONITORING_DATA_TTL=$MONITORING_DATA_TTL
 
 cmd="$@"
 
-if [ ${IS_CELERY} = "true" ]  || [ ${IS_CELERY} = "True" ]
+if [ "${IS_CELERY:-false}" = "true" ] || [ "${IS_CELERY:-false}" = "True" ]
 then
     echo "Executing Celery server $cmd for Production"
 else
