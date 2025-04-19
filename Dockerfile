@@ -1,5 +1,7 @@
 FROM geonode/geonode-base:latest-ubuntu-22.04
-LABEL GeoNode development team
+LABEL team="GeoNoXT development team"
+
+RUN apt-get update -y && apt-get install curl wget unzip gnupg2 locales -y
 
 # copy local geonode src inside container
 COPY . /usr/src/geonode/
