@@ -501,15 +501,6 @@ def _localsettings():
     return settings
 
 
-def _geonode_public_port():
-    gn_pub_port = os.getenv("GEONODE_LB_PORT", "")
-    if not gn_pub_port:
-        gn_pub_port = _container_exposed_port("nginx", os.getenv("GEONODE_INSTANCE_NAME", "geonode"))
-    elif gn_pub_port in ("80", "443"):
-        gn_pub_port = None
-    return gn_pub_port
-
-
 def _prepare_oauth_fixture():
     upurl = urlparse(os.environ["SITEURL"])
     default_fixture = [
