@@ -48,16 +48,18 @@ def waitfordbs(ctx):
 def update(ctx):
     print("***************************setting env*********************************")
     ctx.run("env", pty=True)
-    pub_host = _geonode_public_host()
-    print(f"Public Hostname is {pub_host}")
-    pub_port = _geonode_public_port()
-    print(f"Public PORT is {pub_port}")
-    pub_protocol = "https" if pub_port == "443" else "http"
-    if pub_protocol == "https" or pub_port == "80":
-        pub_port = None
+    ### pub_host = _geonode_public_host()
+    ### print(f"Public Hostname is {pub_host}")
+    ### pub_port = _geonode_public_port()
+    ### print(f"Public PORT is {pub_port}")
+    ### pub_protocol = "https" if pub_port == "443" else "http"
+    ### if pub_protocol == "https" or pub_port == "80":
+    ###     pub_port = None
     db_url = _update_db_connstring()
     geodb_url = _update_geodb_connstring()
-    geonode_docker_host = None
+    ### geonode_docker_host = None
+    """
+    este bloque ya no es necesario porque el contenedor de nginx ya es necesario en gcp
     for _cnt in range(1, 29):
         try:
             geonode_docker_host = str(socket.gethostbyname("geonode"))
@@ -65,6 +67,7 @@ def update(ctx):
         except Exception:
             print(f"...waiting for NGINX to pop-up...{_cnt}")
             time.sleep(1)
+    """
 
     override_env = "$HOME/.override_env"
     if os.path.exists(override_env):
@@ -72,19 +75,23 @@ def update(ctx):
     else:
         print(f"Can not delete the {override_env} file as it doesn't exists")
 
+    """
     if pub_port:
         siteurl = f"{pub_protocol}://{pub_host}:{pub_port}/"
         gs_pub_loc = f"http://{pub_host}:{pub_port}/geoserver/"
     else:
         siteurl = f"{pub_protocol}://{pub_host}/"
         gs_pub_loc = f"http://{pub_host}/geoserver/"
+    """
+    siteurl = os.environ.get("SITEURL", "http://localhost:8000/")
+    gs_pub_loc = os.environ.get("GEOSERVER_LOCATION", "http://localhost:8000/geoserver/")
     envs = {
         "local_settings": str(_localsettings()),
         "siteurl": os.environ.get("SITEURL", siteurl),
-        "geonode_docker_host": geonode_docker_host,
-        "public_protocol": pub_protocol,
-        "public_fqdn": str(pub_host) + str(f":{pub_port}" if pub_port else ""),
-        "public_host": str(pub_host),
+        # "geonode_docker_host": geonode_docker_host,
+        "public_protocol": "https",
+        "public_fqdn": siteurl.split('://')[1].split('/')[0],
+        "public_host": siteurl.split('://')[1].split('/')[0],
         "dburl": os.environ.get("DATABASE_URL", db_url),
         "geodburl": os.environ.get("GEODATABASE_URL", geodb_url),
         "static_root": os.environ.get("STATIC_ROOT", "/mnt/volumes/statics/static/"),
@@ -108,64 +115,19 @@ def update(ctx):
         "override_fn": override_env,
     }
     try:
-        current_allowed = ast.literal_eval(
-            os.getenv("ALLOWED_HOSTS")
-            or "['{public_fqdn}', '{public_host}', 'localhost', 'django', 'geonode',]".format(**envs)
-        )
+        current_allowed = ast.literal_eval(os.getenv("ALLOWED_HOSTS", "['*']") or "['{public_fqdn}', '{public_host}', 'localhost', 'django', 'geonode',]".format(**envs))
     except ValueError:
         current_allowed = []
-    current_allowed.extend([str(pub_host), f"{pub_host}:{pub_port}"])
+    current_allowed.extend([siteurl.split('://')[1].split('/')[0]])
     allowed_hosts = [str(c) for c in current_allowed] + ['"geonode"', '"django"']
 
-    ctx.run(
-        "echo export DJANGO_SETTINGS_MODULE=\
-{local_settings} >> {override_fn}".format(
-            **envs
-        ),
-        pty=True,
-    )
-    ctx.run(
-        "echo export MONITORING_ENABLED=\
-{monitoring} >> {override_fn}".format(
-            **envs
-        ),
-        pty=True,
-    )
-    ctx.run(
-        "echo export MONITORING_HOST_NAME=\
-{monitoring_host_name} >> {override_fn}".format(
-            **envs
-        ),
-        pty=True,
-    )
-    ctx.run(
-        "echo export MONITORING_SERVICE_NAME=\
-{monitoring_service_name} >> {override_fn}".format(
-            **envs
-        ),
-        pty=True,
-    )
-    ctx.run(
-        "echo export MONITORING_DATA_TTL=\
-{monitoring_data_ttl} >> {override_fn}".format(
-            **envs
-        ),
-        pty=True,
-    )
-    ctx.run(
-        "echo export GEOIP_PATH=\
-{geoip_path} >> {override_fn}".format(
-            **envs
-        ),
-        pty=True,
-    )
-    ctx.run(
-        "echo export GEONODE_GEODATABASE_PASSWORD=\
-{geonode_geodb_passwd} >> {override_fn}".format(
-            **envs
-        ),
-        pty=True,
-    )
+    ctx.run("echo export DJANGO_SETTINGS_MODULE={local_settings} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export MONITORING_ENABLED={monitoring} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export MONITORING_HOST_NAME={monitoring_host_name} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export MONITORING_SERVICE_NAME={monitoring_service_name} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export MONITORING_DATA_TTL={monitoring_data_ttl} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GEOIP_PATH={geoip_path} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GEONODE_GEODATABASE_PASSWORD={geonode_geodb_passwd} >> {override_fn}".format(**envs), pty=True)
     ctx.run(
         "echo export DEFAULT_BACKEND_DATASTORE=\
 {default_backend_datastore} >> {override_fn}".format(

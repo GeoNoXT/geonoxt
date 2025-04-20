@@ -52,7 +52,7 @@ else
     invoke migrations
     invoke prepare
 
-    if [ ${FORCE_REINIT} = "true" ]  || [ ${FORCE_REINIT} = "True" ] || [ ! -e "/mnt/volumes/statics/geonode_init.lock" ]; then
+    if [ "${FORCE_REINIT}" = "true" ]  || [ "${FORCE_REINIT}" = "True" ] || [ ! -e "/mnt/volumes/statics/geonode_init.lock" ]; then
         invoke fixtures
         invoke monitoringfixture
         invoke initialized
