@@ -501,20 +501,6 @@ def _localsettings():
     return settings
 
 
-def _geonode_public_host():
-    gn_pub_hostip = os.getenv("GEONODE_LB_HOST_IP", None)
-    if not gn_pub_hostip:
-        gn_pub_hostip = _docker_host_ip()
-    return gn_pub_hostip
-
-
-def _geonode_public_host_ip():
-    gn_pub_hostip = os.getenv("GEONODE_LB_HOST_IP", None)
-    if not gn_pub_hostip or not _is_valid_ip(gn_pub_hostip):
-        gn_pub_hostip = _docker_host_ip()
-    return gn_pub_hostip
-
-
 def _geonode_public_port():
     gn_pub_port = os.getenv("GEONODE_LB_PORT", "")
     if not gn_pub_port:
@@ -566,18 +552,11 @@ def _prepare_monitoring_fixture():
     # upurl = urlparse(os.environ['SITEURL'])
     # net_scheme = upurl.scheme
     # net_loc = upurl.netloc
-    pub_ip = _geonode_public_host_ip()
-    print(f"Public Hostname or IP is {pub_ip}")
-    pub_port = _geonode_public_port()
-    print(f"Public PORT is {pub_port}")
-    try:
-        geonode_ip = socket.gethostbyname("geonode")
-    except Exception:
-        geonode_ip = pub_ip
-    try:
-        geoserver_ip = socket.gethostbyname("geoserver")
-    except Exception:
-        geoserver_ip = pub_ip
+    geonode_ip = str(os.environ["SITEURL"].split("://")[1].split("/")[0])
+    geoserver_ip = str(os.environ["GEOSERVER_LOCATION"].split("://")[1].split("/")[0])
+    print(f"Public geonode Hostname or IP is {geonode_ip}")
+    print(f"Public geoserver_ip Hostname or IP is {geoserver_ip}")
+
     d = "1970-01-01 00:00:00"
     default_fixture = [
         {
