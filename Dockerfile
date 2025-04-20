@@ -4,8 +4,8 @@ LABEL team="GeoNoXT development team"
 RUN apt-get update -y && apt-get install curl wget unzip gnupg2 locales -y
 
 # copy local geonode src inside container
-COPY . /usr/src/geonoxt/
-WORKDIR /usr/src/geonoxt
+COPY . /usr/src/geonode/
+WORKDIR /usr/src/geonode
 
 #COPY monitoring-cron /etc/cron.d/monitoring-cron
 #RUN chmod 0644 /etc/cron.d/monitoring-cron
@@ -15,8 +15,8 @@ WORKDIR /usr/src/geonoxt
 
 COPY wait-for-databases.sh /usr/bin/wait-for-databases
 RUN chmod +x /usr/bin/wait-for-databases
-RUN chmod +x /usr/src/geonoxt/tasks.py \
-    && chmod +x /usr/src/geonoxt/entrypoint.sh \
+RUN chmod +x /usr/src/geonode/tasks.py \
+    && chmod +x /usr/src/geonode/entrypoint.sh \
     && mkdir -p /usr/lib64/sasl2
 
 COPY celery.sh /usr/bin/celery-commands
@@ -43,4 +43,4 @@ RUN apt-get autoremove --purge && \
 EXPOSE 8000
 
 # We provide no command or entrypoint as this image can be used to serve the django project or run celery tasks
-# ENTRYPOINT /usr/src/geonoxt/entrypoint.sh
+# ENTRYPOINT /usr/src/geonode/entrypoint.sh
