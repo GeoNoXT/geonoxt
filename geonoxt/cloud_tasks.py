@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger("geonode")
 
 
-def create_cloud_task(task_name, payload, url_path, dispatch_deadline=None):
+def create_cloud_task(task_name, args, kwargs, url_path="/api/cloud-tasks/run-task/"):
     project = settings.GCP_TASKS_PROJECT_ID
     region = settings.GCP_TASKS_REGION
     queue = settings.GCP_TASKS_QUEUE
@@ -17,6 +17,12 @@ def create_cloud_task(task_name, payload, url_path, dispatch_deadline=None):
 
     client = tasks_v2.CloudTasksClient()
     parent = client.queue_path(project, region, queue)
+
+    payload = {
+        "task_name": task_name,
+        "args": args,
+        "kwargs": kwargs,
+    }
 
     http_request = {
         "http_method": tasks_v2.HttpMethod.POST,
@@ -29,13 +35,12 @@ def create_cloud_task(task_name, payload, url_path, dispatch_deadline=None):
         }
     }
 
-    task = tasks_v2.Task(http_request=http_request)
+    task = {"http_request": http_request}
 
-    if dispatch_deadline:
-        deadline = duration_pb2.Duration()
-        deadline.FromSeconds(dispatch_deadline)
-        task.dispatch_deadline.CopyFrom(deadline)
-
-    response = client.create_task(parent=parent, task=task)
-    logger.info(f"Tarea {task_name} creada: {response.name}")
-    return response
+    try:
+        response = client.create_task(request={"parent": parent, "task": task})
+        logger.info(f"Task {task_name} encolada correctamente en {response.name}")
+        return response
+    except Exception as e:
+        logger.error(f"Error al crear task {task_name}: {e}")
+        raise
