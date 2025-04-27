@@ -1,43 +1,56 @@
-FROM geonode/geonode-base:latest-ubuntu-22.04
-LABEL GeoNode development team
+Dockerfile
 
-# copy local geonode src inside container
-COPY . /usr/src/geonode/
+FROM geonode/geonode-base:latest-ubuntu-22.04
+LABEL team="GeoNoXT development team"
+
 WORKDIR /usr/src/geonode
 
-#COPY monitoring-cron /etc/cron.d/monitoring-cron
-#RUN chmod 0644 /etc/cron.d/monitoring-cron
-#RUN crontab /etc/cron.d/monitoring-cron
-#RUN touch /var/log/cron.log
-#RUN service cron start
+# Actualiza y instala dependencias necesarias en una sola capa
+RUN apt-get update -y && apt-get install -y \
+    curl \
+    wget \
+    unzip \
+    gnupg2 \
+    locales \
+    && apt-get autoremove --purge -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*  # Elimina listas de paquetes para reducir tamaño
 
+
+# Copiar solo los archivos de requisitos primero (esto aprovecha la caché si no cambia)
+COPY requirements.txt .
+# bajar el requirements.txt desde el repo de geonoxt
+# RUN wget https://raw.githubusercontent.com/GeoNoXT/geonoxt/refs/heads/xt.gcp/requirements.txt
+
+
+# Instalación de las dependencias de Python (con optimización)
+RUN pip install --upgrade pip \
+    && yes w | pip install -r requirements.txt
+
+
+# Copiar el código fuente de la aplicación
+COPY . .
+
+
+# Copiar y otorgar permisos a los scripts
 COPY wait-for-databases.sh /usr/bin/wait-for-databases
-RUN chmod +x /usr/bin/wait-for-databases
-RUN chmod +x /usr/src/geonode/tasks.py \
-    && chmod +x /usr/src/geonode/entrypoint.sh
-
 COPY celery.sh /usr/bin/celery-commands
-RUN chmod +x /usr/bin/celery-commands
-
 COPY celery-cmd /usr/bin/celery-cmd
-RUN chmod +x /usr/bin/celery-cmd
 
-# # Install "geonode-contribs" apps
-# RUN cd /usr/src; git clone https://github.com/GeoNode/geonode-contribs.git -b master
-# # Install logstash and centralized dashboard dependencies
-# RUN cd /usr/src/geonode-contribs/geonode-logstash; pip install --upgrade  -e . \
-#     cd /usr/src/geonode-contribs/ldap; pip install --upgrade  -e .
+# Conceder permisos a los scripts y archivos del proyecto
+RUN chmod +x /usr/bin/wait-for-databases \
+    && chmod +x /usr/bin/celery-commands \
+    && chmod +x /usr/bin/celery-cmd \
+    && chmod +x /usr/src/geonode/tasks.py \
+    && chmod +x /usr/src/geonode/entrypoint.sh \
+    && chmod +x /usr/src/geonode/geonoxt_bash_entrypoint.sh \
+    && chown -R www-data:www-data /usr/src/geonode \
+    && mkdir -p /usr/lib64/sasl2
 
-RUN yes w | pip install --src /usr/src -r requirements.txt &&\
-    yes w | pip install -e .
 
-# Cleanup apt update lists
-RUN apt-get autoremove --purge &&\
-    apt-get clean &&\
-    rm -rf /var/lib/apt/lists/*
-
-# Export ports
+# Exponer puertos
 EXPOSE 8000
 
-# We provide no command or entrypoint as this image can be used to serve the django project or run celery tasks
+
+# Entrypoint comentado por ahora, dependiendo del uso
 # ENTRYPOINT /usr/src/geonode/entrypoint.sh

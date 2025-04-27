@@ -341,6 +341,10 @@ MEMCACHED_LOCATION = os.getenv("MEMCACHED_LOCATION", "127.0.0.1:11211")
 MEMCACHED_LOCK_EXPIRE = int(os.getenv("MEMCACHED_LOCK_EXPIRE", 3600))
 MEMCACHED_LOCK_TIMEOUT = int(os.getenv("MEMCACHED_LOCK_TIMEOUT", 10))
 
+DATABASECACHE_ENABLED = ast.literal_eval(os.getenv("DATABASECACHE_ENABLED", "True"))
+DATABASECACHE_BACKEND = os.getenv("DATABASECACHE_BACKEND", "django.core.cache.backends.db.DatabaseCache")
+DATABASECACHE_LOCATION = os.getenv("DATABASECACHE_LOCATION", "cache_table")
+
 CACHES = {
     # DUMMY CACHE FOR DEVELOPMENT
     "default": {
@@ -382,6 +386,20 @@ if MEMCACHED_ENABLED:
     CACHES["default"] = {
         "BACKEND": MEMCACHED_BACKEND,
         "LOCATION": MEMCACHED_LOCATION,
+    }
+elif MEMCACHED_BACKEND:
+    CACHES["default"] = {
+        "BACKEND": DATABASECACHE_BACKEND,
+        "LOCATION": DATABASECACHE_LOCATION,
+    }
+else:
+    CACHES["default"] = {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "geonode-cache",
+        "TIMEOUT": 600,
+        "OPTIONS": {
+            "MAX_ENTRIES": 10000,
+        },
     }
 
 # Whitenoise Settings - ref.: http://whitenoise.evans.io/en/stable/django.html
@@ -2343,3 +2361,16 @@ PERMISSIONS_HANDLERS = ["geonode.security.handlers.AdvancedWorkflowPermissionsHa
 AVATAR_ADD_TEMPLATE = "people/avatar/add.html"
 AVATAR_CHANGE_TEMPLATE = "people/avatar/change.html"
 AVATAR_DELETE_TEMPLATE = "people/avatar/confirm_delete.html"
+
+
+# GeoNoXT Settings
+
+INSTALLED_APPS += (
+    "geonoxt",
+)
+
+USE_GCP = ast.literal_eval(os.getenv("USE_GCP", "True"))
+GCP_TASKS_PROJECT_ID = os.getenv("GCP_TASKS_PROJECT_ID", "geonoxt")
+GCP_TASKS_REGION = os.getenv("GCP_REGION", "us-central1")
+GCP_TASKS_QUEUE = os.getenv("GCP_TASKS_QUEUE", "geonoxt")
+GCP_TASKS_SERVICE_ACCOUNT_EMAIL = os.getenv("GCP_TASKS_SERVICE_ACCOUNT_EMAIL", "sa-tasks-invoker@project.iam.gserviceaccount.com")

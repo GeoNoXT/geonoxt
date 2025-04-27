@@ -98,7 +98,7 @@ XML_PARSER: typing.Final = etree.XMLParser(resolve_entities=False)
 requests.packages.urllib3.disable_warnings()
 
 
-logger = logging.getLogger("geonode.utils")
+logger = logging.getLogger("geonode")
 
 
 class ServerDoesNotExist(Exception):

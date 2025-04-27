@@ -4,6 +4,10 @@ lxml==5.2.1
 psycopg2==2.9.9
 Django==4.2.20
 
+#xt.gcp-dependencies
+google-cloud-tasks
+google-auth
+
 # Other
 amqp==5.2.0
 beautifulsoup4==4.12.3

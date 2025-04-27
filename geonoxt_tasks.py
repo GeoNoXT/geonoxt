@@ -37,12 +37,6 @@ BOOTSTRAP_IMAGE_CHEIP = "codenvy/che-ip:nightly"
 logger = logging.getLogger(__name__)
 
 
-@task
-def waitfordbs(ctx):
-    print("**************************databases*******************************")
-    db_host = os.getenv("DATABASE_HOST", "db")
-    ctx.run(f"/usr/bin/wait-for-databases {db_host}", pty=True)
-
 
 @task
 def update(ctx):
@@ -112,6 +106,10 @@ def update(ctx):
         "gs_web_ui_loc": os.environ.get("GEOSERVER_WEB_UI_LOCATION", gs_pub_loc),
         "gs_pub_loc": os.environ.get("GEOSERVER_PUBLIC_LOCATION", gs_pub_loc),
         "gs_admin_pwd": os.environ.get("GEOSERVER_ADMIN_PASSWORD", "geoserver"),
+        "gcp_tasks_project_id": os.environ.get("GCP_TASKS_PROJECT_ID", "geonoxt"),
+        "gcp_tasks_region": os.environ.get("GCP_TASKS_REGION", "us-central1"),
+        "gcp_tasks_queue": os.environ.get("GCP_TASKS_QUEUE", "geonoxt"),
+        "gcp_tasks_service_account_email": os.environ.get("GCP_TASKS_SERVICE_ACCOUNT_EMAIL", "sa-tasks-invoker@project.iam.gserviceaccount.com"),
         "override_fn": override_env,
     }
     try:
@@ -149,6 +147,11 @@ def update(ctx):
     ctx.run("echo export LOGOUT_URL={siteurl}account/logout/ >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export LOGIN_REDIRECT_URL={siteurl} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export LOGOUT_REDIRECT_URL={siteurl} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GCP_TASKS_PROJECT_ID={gcp_tasks_project_id} >> {gcp_tasks_project_id}".format(**envs), pty=True)
+    ctx.run("echo export GCP_TASKS_REGION={gcp_tasks_region} >> {gcp_tasks_region}".format(**envs), pty=True)
+    ctx.run("echo export GCP_TASKS_QUEUE={gcp_tasks_queue} >> {gcp_tasks_queue}".format(**envs), pty=True)
+    ctx.run("echo export GCP_TASKS_SERVICE_ACCOUNT_EMAIL={gcp_tasks_service_account_email} >> {gcp_tasks_service_account_email}".format(**envs), pty=True)
+
     ctx.run(f"source {override_env}", pty=True)
 
     print("****************************finalize env**********************************")
@@ -171,15 +174,12 @@ def migrations(ctx):
 def statics(ctx):
     print("**************************statics*******************************")
     try:
-        static_root = os.environ.get("STATIC_ROOT", "/mnt/volumes/statics/static/")
-        media_root = os.environ.get("MEDIA_ROOT", "/mnt/volumes/statics/uploaded/")
-        assets_root = os.environ.get("ASSETS_ROOT", "/mnt/volumes/statics/assets/")
+        # static_root = os.environ.get("STATIC_ROOT", "/mnt/volumes/statics/static/")
+        # media_root = os.environ.get("MEDIA_ROOT", "/mnt/volumes/statics/uploaded/")
+        # assets_root = os.environ.get("ASSETS_ROOT", "/mnt/volumes/statics/assets/")
 
-        ctx.run(f"mkdir -pv {static_root} {media_root} {assets_root}")
-        ctx.run(
-            f"python manage.py collectstatic --noinput --settings={_localsettings()}",
-            pty=True,
-        )
+        # ctx.run(f"mkdir -pv {static_root} {media_root} {assets_root}")
+        ctx.run(f"python3 manage.py collectstatic --noinput --settings={_localsettings()}", pty=True)
     except Exception:
         import traceback
         traceback.print_exc()
@@ -376,31 +376,8 @@ def _localsettings():
     return settings
 
 
-def _geonode_public_host():
-    gn_pub_hostip = os.getenv("GEONODE_LB_HOST_IP", None)
-    if not gn_pub_hostip:
-        gn_pub_hostip = _docker_host_ip()
-    return gn_pub_hostip
-
-
-def _geonode_public_host_ip():
-    gn_pub_hostip = os.getenv("GEONODE_LB_HOST_IP", None)
-    if not gn_pub_hostip or not _is_valid_ip(gn_pub_hostip):
-        gn_pub_hostip = _docker_host_ip()
-    return gn_pub_hostip
-
-
-def _geonode_public_port():
-    gn_pub_port = os.getenv("GEONODE_LB_PORT", "")
-    if not gn_pub_port:
-        gn_pub_port = _container_exposed_port("nginx", os.getenv("GEONODE_INSTANCE_NAME", "geonode"))
-    elif gn_pub_port in ("80", "443"):
-        gn_pub_port = None
-    return gn_pub_port
-
-
 def _prepare_oauth_fixture():
-    upurl = urlparse(os.environ["SITEURL"])
+    geoserver_location_url = urlparse(os.environ["GEOSERVER_LOCATION"])
     default_fixture = [
         {
             "model": "oauth2_provider.application",
@@ -410,7 +387,7 @@ def _prepare_oauth_fixture():
                 "created": "2018-05-31T10:00:31.661Z",
                 "updated": "2018-05-31T11:30:31.245Z",
                 "algorithm": "RS256",
-                "redirect_uris": f"{urlunparse(upurl)}geoserver/index.html",
+                "redirect_uris": f"{urlunparse(geoserver_location_url)}index.html",
                 "name": "GeoServer",
                 "authorization_grant_type": "authorization-code",
                 "client_type": "confidential",
@@ -552,8 +529,9 @@ def _prepare_admin_fixture(admin_password, admin_email):
         json.dump(default_fixture, fixturefile)
 
 
+
 @task
-def manage_waitfordbs(ctx):
+def manage_backup(ctx):
     print("**************************databases*******************************")
     db_host = os.getenv("DATABASE_HOST", "db")
     ctx.run(f"yes | python manage.py backup -c settings_sample.ini --skip-geoserver --backup-dir /tmp/", pty=True)
