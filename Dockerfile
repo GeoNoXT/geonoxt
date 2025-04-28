@@ -1,5 +1,3 @@
-Dockerfile
-
 FROM geonode/geonode-base:latest-ubuntu-22.04
 LABEL team="GeoNoXT development team"
 
