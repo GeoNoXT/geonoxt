@@ -4,3 +4,7 @@ from django.apps import AppConfig
 class GeonoxtConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'geonoxt'
+
+    def ready(self):
+        from . import monkey_patch
+        monkey_patch.celery2googlecloud()

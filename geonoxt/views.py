@@ -1,47 +1,40 @@
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseForbidden
+import logging
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from geonode.celery_app import app as celery_app
-import google.auth.transport.requests
-import google.oauth2.id_token
+from celery import current_app as celery_app
+from utils import require_google_token, require_post_method
 import json
 
-AUTHORIZED_AUDIENCE = "https://TU_DOMINIO/geonoxt/ejecutar_task/"
-AUTHORIZED_SERVICE_ACCOUNT = "TU_SERVICE_ACCOUNT@TU_PROJECT_ID.iam.gserviceaccount.com"
+logger = logging.getLogger(__name__)
 
 @csrf_exempt
-def ejecutar_task(request):
-    if request.method != 'POST':
-        return HttpResponseBadRequest('Solo POST permitido.')
-
-    # Validar token
-    auth_header = request.headers.get('Authorization')
-    if not auth_header or not auth_header.startswith('Bearer '):
-        return HttpResponseForbidden('Falta Authorization.')
-
-    token = auth_header.split(' ')[1]
+@require_post_method
+@require_google_token
+def run_cloud_task(request):
     try:
-        request_adapter = google.auth.transport.requests.Request()
-        id_info = google.oauth2.id_token.verify_oauth2_token(token, request_adapter, AUTHORIZED_AUDIENCE)
+        data = json.loads(request.body)
 
-        if id_info['email'] != AUTHORIZED_SERVICE_ACCOUNT:
-            return HttpResponseForbidden('Cuenta de servicio no autorizada.')
+        task_name = data.get('task_name')
+        args = data.get('args', [])
+        kwargs = data.get('kwargs', {})
 
-    except Exception as e:
-        return HttpResponseForbidden(f'Error validando token: {str(e)}')
+        if not task_name:
+            return JsonResponse({'error': 'task_name es requerido'}, status=400)
 
-    # Ejecutar task
-    try:
-        payload = json.loads(request.body)
-        task_name = payload['task_name']
-        args = payload.get('args', [])
-        kwargs = payload.get('kwargs', {})
+        logger.info(f"Ejecutando tarea {task_name} desde Cloud Task")
 
+        # Buscar la tarea en el registro de Celery
         task = celery_app.tasks.get(task_name)
-        if not task:
-            return HttpResponseBadRequest(f'Task {task_name} no encontrada.')
 
+        if not task:
+            logger.error(f"Tarea {task_name} no encontrada en Celery")
+            return JsonResponse({'error': f"Tarea {task_name} no encontrada"}, status=404)
+
+        # Ejecutar la tarea como función normal (sin async)
         result = task.run(*args, **kwargs)
-        return JsonResponse({"status": "ok", "result": str(result)})
+
+        return JsonResponse({'status': 'ok', 'result': str(result)})
 
     except Exception as e:
-        return HttpResponseBadRequest(f'Error ejecutando task: {str(e)}')
+        logger.exception(f"Error ejecutando tarea {e}")
+        return JsonResponse({'error': str(e)}, status=500)
