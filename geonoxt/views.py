@@ -1,11 +1,13 @@
 import logging
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from celery import current_app as celery_app
+# from celery import current_app as celery_app
+from geonode.celery_app import app
 from utils import require_google_token, require_post_method
 import json
 
 logger = logging.getLogger(__name__)
+
 
 @csrf_exempt
 @require_post_method
@@ -24,7 +26,7 @@ def run_cloud_task(request):
         logger.info(f"Ejecutando tarea {task_name} desde Cloud Task")
 
         # Buscar la tarea en el registro de Celery
-        task = celery_app.tasks.get(task_name)
+        task = app.tasks.get(task_name)
 
         if not task:
             logger.error(f"Tarea {task_name} no encontrada en Celery")

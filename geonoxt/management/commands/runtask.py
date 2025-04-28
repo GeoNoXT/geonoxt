@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from celery import current_app
+# from celery import current_app
 from geonode.celery_app import app
 
 
