@@ -218,7 +218,7 @@ def fixtures(ctx):
 def collectstatic(ctx):
     print("************************static artifacts******************************")
     ctx.run(
-        f"django-admin collectstatic --noinput \
+        f"python manage.py collectstatic --noinput \
 --settings={_localsettings()}",
         pty=True,
     )
