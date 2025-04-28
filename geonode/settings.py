@@ -2365,9 +2365,9 @@ AVATAR_DELETE_TEMPLATE = "people/avatar/confirm_delete.html"
 
 # GeoNoXT Settings
 
-INSTALLED_APPS += (
-    "geonoxt",
-)
+# INSTALLED_APPS += (
+#     "geonoxt",
+# )
 
 USE_GCP = ast.literal_eval(os.getenv("USE_GCP", "True"))
 GCP_TASKS_PROJECT_ID = os.getenv("GCP_TASKS_PROJECT_ID", "geonoxt")

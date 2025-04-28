@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from celery import current_app
 from geonode.celery_app import app
 
+
 class Command(BaseCommand):
     help = "Ejecuta tareas de Celery de forma síncrona, sin asincronía"
 
