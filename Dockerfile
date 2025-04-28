@@ -3,6 +3,7 @@ Dockerfile
 FROM geonode/geonode-base:latest-ubuntu-22.04
 LABEL team="GeoNoXT development team"
 
+COPY requirements.txt .
 WORKDIR /usr/src/geonode
 
 # Actualiza y instala dependencias necesarias en una sola capa
