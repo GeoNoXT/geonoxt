@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from celery import current_app
+from geonode.celery_app import app
 
 class Command(BaseCommand):
     help = "Ejecuta tareas de Celery de forma síncrona, sin asincronía"
@@ -14,7 +15,7 @@ class Command(BaseCommand):
 
         try:
             # Importar la tarea de Celery usando el nombre proporcionado
-            task = current_app.tasks[task_name]
+            task = app.tasks[task_name]
         except KeyError:
             self.stderr.write(f"Tarea '{task_name}' no encontrada.")
             return
