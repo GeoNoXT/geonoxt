@@ -1,5 +1,3 @@
-entrypoint
-
 #!/bin/bash
 
 # Exit script in case of error
