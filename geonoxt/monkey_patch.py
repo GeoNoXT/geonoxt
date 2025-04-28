@@ -1,4 +1,4 @@
-from celery import Task
+from celery import Celery
 from .google_cloud_tasks import create_cloud_task
 import os
 import json
@@ -8,8 +8,9 @@ import sys
 
 
 logger = logging.getLogger(__name__)
+app = Celery("geonode")
 
-_original_apply_async = Task.apply_async
+_original_apply_async = app.Task.apply_async
 
 
 def patched_apply_async_celery2googlecloud(self, args=None, kwargs=None, **options):
@@ -41,6 +42,6 @@ def celery2googlecloud():
     """
     Aplica el monkey patch global de apply_async de todas las tareas Celery.
     """
-    Task.apply_async = patched_apply_async_celery2googlecloud
+    app.Task.apply_async = patched_apply_async_celery2googlecloud
     logger.info("Celery Tasks parcheadas para usar Cloud Tasks.")
 
