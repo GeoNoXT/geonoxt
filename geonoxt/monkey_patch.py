@@ -36,7 +36,7 @@ def celery2googlecloud():
     registered_tasks = app.tasks
 
     # Aplicar el patch a todas las tareas registradas
-for task_name, task in registered_tasks.items():
-    # Parchear la tarea
-    task.apply_async = patched_apply_async_celery2googlecloud
-    logger.info(f"Tarea {task_name} parcheada para usar Cloud Tasks.")
+    for task_name, task in registered_tasks.items():
+        # Parchear la tarea
+        task.apply_async = patched_apply_async_celery2googlecloud
+        logger.info(f"Tarea {task_name} parcheada para usar Cloud Tasks.")
