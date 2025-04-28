@@ -1,7 +1,6 @@
 FROM geonode/geonode-base:latest-ubuntu-22.04
 LABEL team="GeoNoXT development team"
 
-COPY requirements.txt .
 WORKDIR /usr/src/geonode
 
 # Actualiza y instala dependencias necesarias en una sola capa
@@ -42,7 +41,7 @@ RUN chmod +x /usr/bin/wait-for-databases \
     && chmod +x /usr/bin/celery-cmd \
     && chmod +x /usr/src/geonode/tasks.py \
     && chmod +x /usr/src/geonode/entrypoint.sh \
-    && chmod +x /usr/src/geonode/geonoxt_bash_entrypoint.sh \
+    && chmod +x /usr/src/geonode/entrypoint_geonoxt_bash.sh \
     && chown -R www-data:www-data /usr/src/geonode \
     && mkdir -p /usr/lib64/sasl2
 
