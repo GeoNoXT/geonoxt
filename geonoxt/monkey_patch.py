@@ -1,5 +1,5 @@
 from celery import Task
-from google_cloud_tasks import create_cloud_task
+from .google_cloud_tasks import create_cloud_task
 import os
 import json
 import logging
