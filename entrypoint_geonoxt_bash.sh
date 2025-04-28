@@ -1,5 +1,3 @@
-geonox_bash_entrypoint.sh
-
 #!/bin/bash
 
 # Exit script in case of error
