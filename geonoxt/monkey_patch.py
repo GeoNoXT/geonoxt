@@ -18,15 +18,16 @@ def patched_apply_async_celery2googlecloud(self, args=None, kwargs=None, **optio
         kwargs = {}
         if options:
             kwargs.update(options)
-
+    """
     # Detecta si estamos en modo "directo" (por ejemplo un management command)
     if 'manage.py' in sys.argv[0]:
         logger.info(f"Ejecutando {task_name} directamente sin pasar por Celery.")
         return self.run(*args, **kwargs)
+    """
 
     logger.info(f"Encolando tarea {task_name} en Cloud Tasks.")
     return create_cloud_task(task_name, args, kwargs, "/api/v2/management-tasks/run-task-job/")
-
+    
 
 def celery2googlecloud():
     """

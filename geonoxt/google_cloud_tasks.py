@@ -3,6 +3,7 @@ from google.cloud import tasks_v2
 from google.protobuf import duration_pb2
 from django.conf import settings
 from urllib.parse import urljoin
+import django.core.serializers.json
 import logging
 
 logger = logging.getLogger("geonode")
@@ -28,7 +29,7 @@ def create_cloud_task(task_name, args, kwargs, url_path="/api/v2/management-task
         "http_method": tasks_v2.HttpMethod.POST,
         "url": url,
         "headers": {"Content-type": "application/json"},
-        "body": json.dumps(payload).encode(),
+        "body": json.dumps(payload, cls=django.core.serializers.json.DjangoJSONEncoder).encode(),
         "oidc_token": {
             "service_account_email": service_account_email,
             "audience": settings.SITEURL.rstrip("/")

@@ -400,7 +400,8 @@ def _geonode_public_port():
 
 
 def _prepare_oauth_fixture():
-    upurl = urlparse(os.environ["SITEURL"])
+    from urllib.parse import urljoin
+    upurl = urljoin(os.environ["GEOSERVER_LOCATION"], '/index.html')
     default_fixture = [
         {
             "model": "oauth2_provider.application",
@@ -410,7 +411,7 @@ def _prepare_oauth_fixture():
                 "created": "2018-05-31T10:00:31.661Z",
                 "updated": "2018-05-31T11:30:31.245Z",
                 "algorithm": "RS256",
-                "redirect_uris": f"{urlunparse(upurl)}geoserver/index.html",
+                "redirect_uris": f"{upurl}",
                 "name": "GeoServer",
                 "authorization_grant_type": "authorization-code",
                 "client_type": "confidential",
