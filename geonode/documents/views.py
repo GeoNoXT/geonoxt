@@ -100,6 +100,8 @@ class DocumentUploadView(CreateView):
         try:
             return super().post(request, *args, **kwargs)
         except Exception as e:
+            print(e)
+            logger.error(f"Error in DocumentUploadView: {e}")
             exception_response = geonode_exception_handler(e, {})
             return HttpResponse(
                 json.dumps(exception_response.data),
