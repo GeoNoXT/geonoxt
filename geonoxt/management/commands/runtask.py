@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
-# from celery import current_app
 from geonode.celery_app import app
+import json
 
 
 class Command(BaseCommand):
@@ -8,11 +8,20 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('task_name', type=str, help='El nombre de la tarea de Celery')
-        parser.add_argument('task_args', nargs='*', help='Argumentos de la tarea', default=[])
+        parser.add_argument('task_args', nargs='*', help='Argumentos posicionales', default=[])
+        parser.add_argument('--task-args', dest='task_args_json', type=json.loads,
+                            help='Lista de argumentos posicionales como JSON (opcional)')
+        parser.add_argument('--task-kwargs', type=json.loads, default='{}',
+                            help='Argumentos nombrados en JSON')
 
     def handle(self, *args, **options):
         task_name = options['task_name']
-        task_args = options['task_args']
+        task_args = options.get('task_args_json')
+
+        if task_args is None:
+            task_args = [self._parse_argument(arg) for arg in options['task_args']]
+
+        task_kwargs = options.get('task_kwargs', {})
 
         try:
             # Importar la tarea de Celery usando el nombre proporcionado
@@ -21,12 +30,9 @@ class Command(BaseCommand):
             self.stderr.write(f"Tarea '{task_name}' no encontrada.")
             return
 
-        # Convertir los argumentos a los tipos correctos, si es necesario
-        task_args = [self._parse_argument(arg) for arg in task_args]
-
         try:
             # Ejecutar la tarea de forma síncrona (sin asincronía)
-            result = task.run(*task_args)
+            result = task.run(*task_args, **task_kwargs)
 
             # Mostrar el resultado de la ejecución
             self.stdout.write(f"Tarea ejecutada exitosamente, resultado: {result}")

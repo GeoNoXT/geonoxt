@@ -1,9 +1,10 @@
 import logging
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-# from celery import current_app as celery_app
-from geonode.celery_app import app
 from utils import require_google_token, require_post_method
+from django.core.serializers.json import DjangoJSONEncoder
+from django.conf import settings
+from google.cloud import run_v2
 import json
 
 logger = logging.getLogger(__name__)
@@ -23,20 +24,49 @@ def cloud_task_run_job(request):
         if not task_name:
             return JsonResponse({'error': 'task_name es requerido'}, status=400)
 
+        if not isinstance(args, list) or not isinstance(kwargs, dict):
+            return JsonResponse({'error': 'args debe ser una lista y kwargs un diccionario'}, status=400)
+
         logger.info(f"Ejecutando tarea {task_name} desde Cloud Task")
 
-        # Buscar la tarea en el registro de Celery
-        task = app.tasks.get(task_name)
+        # Construir el comando a pasar al job
+        command = [
+            "python",
+            "manage.py",
+            "run_celery_task",
+            task_name,
+            *map(str, args),  # convertir todos los args a string
+            "--task-kwargs", json.dumps(kwargs)
+        ]
 
-        if not task:
-            logger.error(f"Tarea {task_name} no encontrada en Celery")
-            return JsonResponse({'error': f"Tarea {task_name} no encontrada"}, status=404)
+        # Lanzar el job
+        run_cloud_run_job("geonoxt-django-1", command)
 
-        # Ejecutar la tarea como función normal (sin async)
-        result = task.run(*args, **kwargs)
-
-        return JsonResponse({'status': 'ok', 'result': str(result)})
+        return JsonResponse({'status': 'job triggered'}, encoder=DjangoJSONEncoder)
 
     except Exception as e:
-        logger.exception(f"Error ejecutando tarea {e}")
+        logger.exception("Error ejecutando tarea")
         return JsonResponse({'error': str(e)}, status=500)
+
+
+def run_cloud_run_job(job_name, command_override):
+    project_id = settings.GCP_TASKS_PROJECT_ID
+    region = settings.GCP_REGION
+
+    client = run_v2.JobsClient()
+    parent = f"projects/{project_id}/locations/{region}"
+    name = f"{parent}/jobs/{job_name}"
+
+    # Lanzar ejecución del Job
+    response = client.run_job(
+        name=name,
+        overrides=run_v2.RunJobRequest.Overrides(
+            container_overrides=[
+                run_v2.ContainerOverride(
+                    command=command_override
+                )
+            ]
+        )
+    )
+    logger.info(f"Cloud Run Job lanzado: {response.name}")
+
