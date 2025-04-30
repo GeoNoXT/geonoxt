@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 @csrf_exempt
 @require_post_method
 @require_google_token
-def run_cloud_task(request):
+def cloud_task_run_job(request):
     try:
         data = json.loads(request.body)
 

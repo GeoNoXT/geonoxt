@@ -26,8 +26,8 @@ def patched_apply_async_celery2googlecloud(self, args=None, kwargs=None, **optio
     """
 
     logger.info(f"Encolando tarea {task_name} en Cloud Tasks.")
-    return create_cloud_task(task_name, args, kwargs, "/api/v2/management-tasks/run-task-job/")
-    
+    return create_cloud_task(task_name, args, kwargs, "/api/v2/management-tasks/cloud-task-run-job/")
+
 
 def celery2googlecloud():
     """

@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger("geonode")
 
 
-def create_cloud_task(task_name, args, kwargs, url_path="/api/v2/management-tasks/run-task-job/"):
+def create_cloud_task(task_name, args, kwargs, url_path="/api/v2/management-tasks/cloud-task-run-job/"):
     project = settings.GCP_TASKS_PROJECT_ID
     region = settings.GCP_TASKS_REGION
     queue = settings.GCP_TASKS_QUEUE
