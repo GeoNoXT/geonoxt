@@ -401,7 +401,7 @@ def _geonode_public_port():
 
 def _prepare_oauth_fixture():
     from urllib.parse import urljoin
-    upurl = urljoin(os.environ["GEOSERVER_LOCATION"], '/index.html')
+    upurl = urljoin(os.environ["GEOSERVER_LOCATION"], '/geoserver/index.html')
     default_fixture = [
         {
             "model": "oauth2_provider.application",
