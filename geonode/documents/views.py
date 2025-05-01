@@ -104,7 +104,7 @@ class DocumentUploadView(CreateView):
             logger.error(f"Error in DocumentUploadView: {e}")
             exception_response = geonode_exception_handler(e, {})
             return HttpResponse(
-                json.dumps(exception_response.data),
+                json.dumps(exception_response.data if exception_response and exception_response.data else {"error": str(e)}),
                 content_type="application/json",
                 status=exception_response.status_code,
             )
