@@ -48,7 +48,8 @@ from .utils import get_download_response
 from .models import Document
 from .forms import DocumentCreateForm, DocumentReplaceForm
 
-logger = logging.getLogger("geonode.documents.views")
+# logger = logging.getLogger("geonode.documents.views")
+logger = logging.getLogger("geonode")
 
 ALLOWED_DOC_TYPES = settings.ALLOWED_DOCUMENT_TYPES
 
