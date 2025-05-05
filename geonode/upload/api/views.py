@@ -60,7 +60,7 @@ from geonode.upload.api.serializer import (
     UploadSizeLimitSerializer,
 )
 
-logger = logging.getLogger("importer")
+logger = logging.getLogger("geonode")
 
 
 class UploadSizeLimitViewSet(DynamicModelViewSet):
@@ -148,9 +148,12 @@ class ImporterViewSet(DynamicModelViewSet):
         It clone on the local repo the file that the user want to upload
         """
         _file = request.FILES.get("base_file") or request.data.get("base_file")
+        logger.info("_file: ", _file)
         execution_id = None
         asset_handler = LocalAssetHandler()
+        logger.info("asset_handler: ", asset_handler)
         asset_dir = asset_handler._create_asset_dir()
+        logger.info("asset_dir: ", asset_dir)
 
         serializer = self.get_serializer_class()
         data = serializer(data=request.data)
