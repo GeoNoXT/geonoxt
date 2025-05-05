@@ -60,7 +60,7 @@ from geonode.upload.api.serializer import (
     UploadSizeLimitSerializer,
 )
 
-logger = logging.getLogger("importer")
+logger = logging.getLogger("geonode")
 
 
 class UploadSizeLimitViewSet(DynamicModelViewSet):
@@ -147,25 +147,16 @@ class ImporterViewSet(DynamicModelViewSet):
         the new import flow is follow, else the normal upload api is used.
         It clone on the local repo the file that the user want to upload
         """
-        print("ImporterViewSet.create")
-        logger.info(f"ImporterViewSet.create")
         _file = request.FILES.get("base_file") or request.data.get("base_file")
-        print("_file", _file)
-        logger.info(f"_file", _file)
+        logger.info("_file: ", _file)
         execution_id = None
         asset_handler = LocalAssetHandler()
-        print("asset_handler", asset_handler)
-        logger.info(f"asset_handler", asset_handler)
+        logger.info("asset_handler: ", asset_handler)
         asset_dir = asset_handler._create_asset_dir()
-        print("asset_dir", asset_dir)
-        logger.info(f"asset_dir", asset_dir)
+        logger.info("asset_dir: ", asset_dir)
 
         serializer = self.get_serializer_class()
-        print("serializer", serializer)
-        logger.info(f"serializer", serializer)
         data = serializer(data=request.data)
-        print("data", data)
-        logger.info(f"data", data)
         storage_manager = None
         # serializer data validation
         data.is_valid(raise_exception=True)
@@ -173,9 +164,6 @@ class ImporterViewSet(DynamicModelViewSet):
             **data.data.copy(),
             **{key: value[0] if isinstance(value, list) else value for key, value in request.FILES.items()},
         }
-
-        print("_data", _data)
-        logger.info(f"_data", _data)
 
         if "zip_file" in _data or "kmz_file" in _data:
             # if a zipfile is provided, we need to unzip it before searching for an handler
@@ -192,10 +180,6 @@ class ImporterViewSet(DynamicModelViewSet):
             )
 
         handler = orchestrator.get_handler(_data)
-
-        print("handler", handler)
-        logger.info(f"handler", handler)
-
         # not file but handler means that is a remote resource
         if handler:
             asset = None
@@ -203,23 +187,10 @@ class ImporterViewSet(DynamicModelViewSet):
             try:
                 # cloning data into a local folder
                 extracted_params, _data = handler.extract_params_from_data(_data)
-
-                print("extracted_params", extracted_params)
-                logger.info(f"extracted_params", extracted_params)
-                print("_data", _data)
-                logger.info(f"_data", _data)
-
                 if _file:
                     storage_manager, asset, files = self._handle_asset(
                         request, asset_dir, storage_manager, _data, handler
                     )
-
-                    print("storage_manager", storage_manager)
-                    logger.info(f"storage_manager", storage_manager)
-                    print("asset", asset)
-                    logger.info(f"asset", asset)
-                    print("files", files)
-                    logger.info(f"files", files)
 
                     self.validate_upload(request, storage_manager)
 

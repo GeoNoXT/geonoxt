@@ -1,8 +1,10 @@
 import logging
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from utils import require_google_token, require_post_method
+from .utils import require_google_token, require_post_method
 from django.core.serializers.json import DjangoJSONEncoder
+import google.auth
+from google.auth.transport.requests import AuthorizedSession
 from django.conf import settings
 from google.cloud import run_v2
 import json
@@ -53,10 +55,31 @@ def run_cloud_run_job(job_name, command_override):
     project_id = settings.GCP_TASKS_PROJECT_ID
     region = settings.GCP_REGION
 
+    credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+    authed_session = AuthorizedSession(credentials)
+
     client = run_v2.JobsClient()
     parent = f"projects/{project_id}/locations/{region}"
     name = f"{parent}/jobs/{job_name}"
 
+    job_full_name = f"projects/{project_id}/locations/{region}/jobs/{job_name}"
+    url = f"https://run.googleapis.com/v2/{job_full_name}:run"
+
+    payload = {
+        "overrides": {
+            "containerOverrides": [{
+                "command": command_override
+            }]
+        }
+    }
+
+    response = authed_session.post(url, json=payload)
+
+    if response.status_code >= 400:
+        logger.error(f"Fallo al ejecutar Cloud Run Job: {response.text}")
+        raise Exception(f"Error ejecutando job: {response.text}")
+
+    """
     # Lanzar ejecución del Job
     response = client.run_job(
         name=name,
@@ -69,4 +92,7 @@ def run_cloud_run_job(job_name, command_override):
         )
     )
     logger.info(f"Cloud Run Job lanzado: {response.name}")
+    """
 
+    logger.info(f"Cloud Run Job lanzado correctamente: {response.json()}")
+    return response.json()

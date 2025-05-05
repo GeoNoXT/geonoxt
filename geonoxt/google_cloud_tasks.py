@@ -25,6 +25,9 @@ def create_cloud_task(task_name, args, kwargs, url_path="/api/v2/management-task
         "kwargs": kwargs,
     }
 
+    logger.info(f"Encolando tarea {task_name} en CloudTasks.")
+    logger.info(f"payload", payload)
+
     http_request = {
         "http_method": tasks_v2.HttpMethod.POST,
         "url": url,

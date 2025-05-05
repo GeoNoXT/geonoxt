@@ -106,6 +106,16 @@ def import_orchestrator(
             Returns:
                     None
     """
+    logger.info("self", self)
+    logger.info("files", files)
+    logger.info("execution_id", execution_id)
+    logger.info("handler", handler)
+    logger.info("step", step)
+    logger.info("layer_name", layer_name)
+    logger.info("alternate", alternate)
+    logger.info("action", action)
+    logger.info("kwargs", kwargs)
+
     try:
         # extract the resource_type of the layer and retrieve the expected handler
 

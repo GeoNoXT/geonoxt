@@ -146,6 +146,11 @@ urlpatterns += [
     ),
 ]
 
+if "geonoxt" in settings.INSTALLED_APPS:
+    urlpatterns += [
+        path("", include("geonoxt.urls")),
+    ]
+
 # tinymce WYSIWYG HTML Editor
 if "tinymce" in settings.INSTALLED_APPS:
     urlpatterns += [
