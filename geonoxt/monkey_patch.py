@@ -1,6 +1,7 @@
 from geonode.celery_app import app
 from geonode.upload.celery_app import importer_app
 from .google_cloud_tasks import create_cloud_task
+from celery.canvas import Signature as CelerySignature
 import logging
 import sys
 
@@ -42,6 +43,10 @@ def celery2googlecloud():
         for task_name, task in celery_instance.tasks.items():
             task.apply_async = patched_apply_async_celery2googlecloud
             logger.info(f"Tarea {task_name} parcheada para usar Cloud Tasks.")
+
+    # patch signature
+    CelerySignature.apply_async = patched_apply_async_celery2googlecloud
+    logger.info("Signature.apply_async parcheado para usar Cloud Tasks.")
 
     """
     for task_name, task in registered_tasks.items():
