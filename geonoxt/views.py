@@ -1,7 +1,7 @@
 import logging
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from utils import require_google_token, require_post_method
+from .utils import require_google_token, require_post_method
 from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from google.cloud import run_v2
