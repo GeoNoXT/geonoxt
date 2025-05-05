@@ -26,7 +26,7 @@ def patched_apply_async_celery2googlecloud(self, args=None, kwargs=None, **optio
         logger.info(f"Ejecutando {task_name} directamente sin pasar por Celery.")
         return self.run(*args, **kwargs)
 
-    logger.info(f"Encolando tarea {task_name} en Cloud Tasks.")
+    logger.info(f"Encolando tarea {task_name} desde Moneky patch.")
     return create_cloud_task(task_name, args, kwargs, "/api/v2/management-tasks/cloud-task-run-job/")
 
 
@@ -47,11 +47,4 @@ def celery2googlecloud():
     # patch signature
     CelerySignature.apply_async = patched_apply_async_celery2googlecloud
     logger.info("Signature.apply_async parcheado para usar Cloud Tasks.")
-
-    """
-    for task_name, task in registered_tasks.items():
-        # Parchear la tarea
-        task.apply_async = patched_apply_async_celery2googlecloud
-        logger.info(f"Tarea {task_name} parcheada para usar Cloud Tasks.")
-    """
 

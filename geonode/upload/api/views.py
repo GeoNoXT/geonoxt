@@ -221,6 +221,7 @@ class ImporterViewSet(DynamicModelViewSet):
                 )
 
                 sig = import_orchestrator.s(files, str(execution_id), handler=str(handler), action=action)
+                logger.info(f"sig", sig)
                 sig.apply_async()
                 return Response(data={"execution_id": execution_id}, status=201)
             except Exception as e:
