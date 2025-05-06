@@ -64,7 +64,7 @@ def update(ctx):
             break
         except Exception:
             print(f"...waiting for NGINX to pop-up...{_cnt}")
-            time.sleep(1)
+            time.sleep(1)  # eliminar reintentos si no se usa nginx
 
     override_env = "$HOME/.override_env"
     if os.path.exists(override_env):
