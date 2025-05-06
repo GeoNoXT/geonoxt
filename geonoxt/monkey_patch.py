@@ -27,6 +27,7 @@ def patched_apply_async_celery2googlecloud(self, args=None, kwargs=None, **optio
         return self.run(*args, **kwargs)
 
     logger.info(f"Encolando tarea {task_name} desde Moneky patch.")
+    logger.debug(f"[{task_name}] args={args}, kwargs={kwargs}")
     return create_cloud_task(task_name, args, kwargs, "/api/v2/management-tasks/cloud-task-run-job/")
 
 
