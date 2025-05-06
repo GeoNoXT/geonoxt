@@ -35,7 +35,6 @@ def celery2googlecloud():
     Aplica el monkey patch global de apply_async de todas las tareas Celery registradas.
     """
     # Obtener todas las tareas registradas en Celery
-    registered_tasks = app.tasks
     apps_to_patch = [app, importer_app]
 
     # Aplicar el patch a todas las tareas registradas
