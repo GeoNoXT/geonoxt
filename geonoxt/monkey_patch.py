@@ -14,12 +14,12 @@ def patched_apply_async_celery2googlecloud(self, args=None, kwargs=None, **optio
     """
     task_name = self.name
 
-    if args is None:
-        args = ()
-    if kwargs is None:
-        kwargs = {}
-        if options:
-            kwargs.update(options)
+    # Usar los args/kwargs del signature si no se pasan explícitamente
+    args = args if args is not None else getattr(self, "args", ())
+    kwargs = kwargs if kwargs is not None else getattr(self, "kwargs", {})
+
+    if options:
+        kwargs.update(options)
 
     # Detecta si estamos en modo "directo" (por ejemplo un management command)
     if 'manage.py' in sys.argv[0]:
