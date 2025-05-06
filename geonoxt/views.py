@@ -9,7 +9,7 @@ from django.conf import settings
 from google.cloud import run_v2
 import json
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('geonode')
 
 
 @csrf_exempt
@@ -22,6 +22,10 @@ def cloud_task_run_job(request):
         task_name = data.get('task_name')
         args = data.get('args', [])
         kwargs = data.get('kwargs', {})
+
+        logger.info(f"Ejecutando tarea {task_name} desde Cloud Task")
+        logger.info(f"args {args} desde Cloud Task")
+        logger.info(f"kwargs {kwargs} desde Cloud Task")
 
         if not task_name:
             return JsonResponse({'error': 'task_name es requerido'}, status=400)
@@ -47,7 +51,7 @@ def cloud_task_run_job(request):
         return JsonResponse({'status': 'job triggered'}, encoder=DjangoJSONEncoder)
 
     except Exception as e:
-        logger.exception("Error ejecutando tarea")
+        logger.error("Error ejecutando tarea", e)
         return JsonResponse({'error': str(e)}, status=500)
 
 
